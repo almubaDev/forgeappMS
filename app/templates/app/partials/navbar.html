@@ -1,0 +1,62 @@
+{% load static %}
+
+<nav class="bg-forge-white shadow-md border-b border-forge-blue-light">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+            
+            <!-- Logo y marca a la izquierda -->
+            <div class="flex items-center space-x-3">
+                <img src="{% static 'app/img/logo.png' %}" alt="ForgeApp Logo" class="h-10 w-10">
+                <span class="brand text-xl font-bold text-forge-blue-dark">ForgeApp</span>
+            </div>
+            
+            <!-- Elementos del usuario a la derecha -->
+            <div class="flex items-center space-x-4">
+                {% if user.is_authenticated %}
+                    <!-- Email del usuario -->
+                    <span class="text-forge-gray text-sm">
+                        <i class="fas fa-user mr-1"></i>
+                        {{ user.email }}
+                    </span>
+                    
+                    <!-- Acceso al admin para superusers -->
+                    {% if user.is_superuser %}
+                        <a href="/admin/" 
+                           class="text-forge-orange hover:text-forge-orange-dark px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200">
+                            <i class="fas fa-cog mr-1"></i>
+                            Admin
+                        </a>
+                    {% endif %}
+                    
+                    <!-- Indicador de staff -->
+                    {% if user.is_staff %}
+                        <span class="text-forge-orange px-2 py-1 rounded-full text-xs font-medium">
+                            <i class="fas fa-crown mr-1"></i>
+                            Staff
+                        </span>
+                    {% endif %}
+                    
+                    <!-- Botón de cerrar sesión -->
+                    <a href="{% url 'users:logout' %}" 
+                       class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                        <i class="fas fa-sign-out-alt mr-1"></i>
+                        Cerrar Sesión
+                    </a>
+                {% else %}
+                    <!-- Enlaces para usuarios no autenticados -->
+                    <a href="{% url 'users:login' %}" 
+                       class="text-forge-blue hover:text-forge-blue-dark px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                        <i class="fas fa-sign-in-alt mr-1"></i>
+                        Iniciar Sesión
+                    </a>
+                    <a href="{% url 'users:signup' %}" 
+                       class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                        <i class="fas fa-user-plus mr-1"></i>
+                        Registrarse
+                    </a>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,146 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Eliminar {{ app.display_name }} - ForgeApp{% endblock %}
+
+{% block content %}
+<div class="h-full bg-forge-light flex items-center justify-center">
+    <div class="max-w-md w-full mx-4">
+        
+        <!-- Tarjeta de confirmación -->
+        <div class="bg-forge-white rounded-xl shadow-2xl p-8 text-center">
+            
+            <!-- Icono de advertencia -->
+            <div class="mb-6">
+                <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                </div>
+            </div>
+            
+            <!-- Título -->
+            <h2 class="font-title text-2xl font-bold text-forge-dark mb-2">
+                ¿Eliminar Aplicación?
+            </h2>
+            
+            <!-- Información de la app -->
+            <div class="bg-forge-light rounded-lg p-4 mb-6">
+                <div class="flex items-center justify-center mb-3">
+                    <i class="{{ app.icon }} text-{{ app.color }} text-3xl mr-3"></i>
+                    <div class="text-left">
+                        <p class="font-semibold text-forge-dark">{{ app.display_name }}</p>
+                        <p class="text-sm text-forge-gray">{{ app.name }}</p>
+                    </div>
+                </div>
+                
+                <!-- Tipo de app -->
+                <div class="text-center">
+                    {% if app.app_type == 'admin' %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-forge-orange text-forge-white">
+                            <i class="fas fa-crown mr-1"></i>
+                            Administrativa
+                        </span>
+                    {% else %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-forge-blue text-forge-white">
+                            <i class="fas fa-cube mr-1"></i>
+                            Micro SAAS
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Mensaje de advertencia -->
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p class="text-red-700 text-sm">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    Esta acción no se puede deshacer. La aplicación será eliminada permanentemente.
+                </p>
+                
+                {% if app.app_type == 'saas' %}
+                    <p class="text-red-600 text-xs mt-2">
+                        <i class="fas fa-users mr-1"></i>
+                        También se eliminarán todos los accesos de usuarios a esta aplicación.
+                    </p>
+                {% endif %}
+            </div>
+            
+            <!-- Formulario de confirmación -->
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                
+                <!-- Checkbox de confirmación -->
+                <div class="text-left">
+                    <label class="flex items-start">
+                        <input type="checkbox" 
+                               name="confirm_delete" 
+                               id="confirm_delete"
+                               class="mt-1 h-4 w-4 text-red-600 focus:ring-red-500 border-forge-gray rounded"
+                               required>
+                        <span class="ml-2 text-sm text-forge-dark">
+                            Entiendo que esta acción es irreversible y quiero eliminar 
+                            <strong>{{ app.display_name }}</strong> definitivamente.
+                        </span>
+                    </label>
+                </div>
+                
+                <!-- Botones -->
+                <div class="flex items-center justify-between pt-4">
+                    <a href="{% url 'app:app_registry_list' %}" 
+                       class="bg-forge-gray hover:bg-forge-dark text-forge-white font-medium px-2 py-1 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Cancelar
+                    </a>
+                    
+                    <button type="submit" 
+                            id="delete_button"
+                            class="bg-red-600 hover:bg-red-700 text-forge-white font-medium px-2 py-1 rounded-lg transition-colors duration-200 opacity-50 cursor-not-allowed"
+                            disabled>
+                        <i class="fas fa-trash mr-2"></i>
+                        Eliminar Aplicación
+                    </button>
+                </div>
+                
+            </form>
+            
+        </div>
+        
+        <!-- Enlace adicional -->
+        <div class="text-center mt-4">
+            <a href="{% url 'app:app_registry_update' app.pk %}" 
+               class="text-forge-blue hover:text-forge-blue-dark text-sm">
+                <i class="fas fa-edit mr-1"></i>
+                ¿Mejor editar la aplicación?
+            </a>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Habilitar/deshabilitar botón de eliminar según checkbox
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkbox = document.getElementById('confirm_delete');
+        const deleteButton = document.getElementById('delete_button');
+        
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                deleteButton.disabled = false;
+                deleteButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                deleteButton.classList.add('hover:bg-red-700');
+            } else {
+                deleteButton.disabled = true;
+                deleteButton.classList.add('opacity-50', 'cursor-not-allowed');
+                deleteButton.classList.remove('hover:bg-red-700');
+            }
+        });
+        
+        // Confirmación adicional al enviar
+        deleteButton.addEventListener('click', function(e) {
+            if (!confirm('¿Estás completamente seguro de que quieres eliminar esta aplicación?')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}

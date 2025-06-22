@@ -1,0 +1,84 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Error 418 - I'm a teapot{% endblock %}
+
+{% block content %}
+<div class="h-full bg-gradient-to-br from-forge-blue-light to-forge-blue flex items-center justify-center">
+    <div class="text-center text-white px-8">
+        
+        <!-- Icono de tetera gigante -->
+        <div class="mb-8">
+            <i class="fas fa-coffee text-9xl text-forge-orange animate-bounce"></i>
+        </div>
+        
+        <!-- Error code -->
+        <h1 class="font-title text-8xl font-bold mb-4 text-forge-white">
+            {{ error_code }}
+        </h1>
+        
+        <!-- Error message -->
+        <h2 class="font-title text-3xl font-semibold mb-6 text-forge-orange">
+            {{ error_message }}
+        </h2>
+        
+        <!-- Mensaje divertido -->
+        <div class="max-w-2xl mx-auto mb-8">
+            <p class="text-xl mb-4 text-forge-white text-opacity-90">
+                ¡Ups! Parece que soy una tetera y no puedo hacer café. 
+            </p>
+            <p class="text-lg text-forge-white text-opacity-80">
+                Este es el famoso error HTTP 418 definido en el RFC 2324 como parte de una broma del April Fool's Day de 1998.
+            </p>
+        </div>
+        
+        <!-- Información del usuario -->
+        <div class="bg-forge-white bg-opacity-20 rounded-lg p-6 mb-8 max-w-md mx-auto">
+            <h3 class="font-title text-lg font-semibold mb-2 text-forge-orange">
+                <i class="fas fa-user mr-2"></i>
+                Usuario conectado
+            </h3>
+            <p class="text-forge-white">{{ user.email }}</p>
+            {% if user.is_staff %}
+                <span class="inline-block bg-forge-orange text-forge-white px-2 py-1 rounded-full text-sm mt-2">
+                    <i class="fas fa-crown mr-1"></i>
+                    Staff
+                </span>
+            {% endif %}
+        </div>
+        
+        <!-- Botón para volver -->
+        <div class="space-y-4">
+            <a href="{% url 'app:dashboard' %}" 
+               class="inline-block bg-forge-orange hover:bg-forge-orange-dark text-forge-white font-medium px-8 py-3 rounded-lg transition-all duration-200 transform hover:scale-105">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Volver al Dashboard
+            </a>
+            
+            <br>
+            
+            <a href="https://tools.ietf.org/html/rfc2324" 
+               target="_blank"
+               class="inline-block bg-forge-white bg-opacity-20 hover:bg-opacity-30 text-forge-white font-medium px-6 py-2 rounded-lg transition-all duration-200 text-sm">
+                <i class="fas fa-external-link-alt mr-2"></i>
+                Leer RFC 2324
+            </a>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Animación personalizada para la tetera */
+    @keyframes steam {
+        0%, 100% { opacity: 0.3; transform: translateY(0px) scale(1); }
+        50% { opacity: 0.8; transform: translateY(-10px) scale(1.1); }
+    }
+    
+    .fa-coffee {
+        animation: steam 3s ease-in-out infinite;
+    }
+</style>
+{% endblock %}

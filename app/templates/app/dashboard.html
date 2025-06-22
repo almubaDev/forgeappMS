@@ -1,0 +1,113 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - ForgeApp{% endblock %}
+
+{% block content %}
+<div class="h-full bg-forge-light flex flex-col">
+    
+    <!-- Header del Dashboard -->
+    <div class="bg-forge-white border-b border-forge-blue-light flex-shrink-0">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="font-title text-3xl font-bold text-forge-dark">
+                        Dashboard
+                    </h1>
+                    <p class="text-forge-gray mt-1">
+                        Bienvenido, {{ user.get_full_name|default:user.email }}
+                    </p>
+                </div>
+                
+                <!-- Stats resumidos - Solo para usuarios normales -->
+                {% if not user.is_staff %}
+                    <div class="flex items-center space-x-6">
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-forge-blue">{{ total_apps }}</p>
+                            <p class="text-forge-gray text-sm">Apps Disponibles</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contenedor scrolleable de apps -->
+    <div class="flex-1 overflow-hidden p-4">
+        <div class="bg-forge-white rounded-xl shadow-md h-full flex flex-col">
+            <div class="p-6 flex-shrink-0">
+                <h2 class="font-title text-xl font-bold text-forge-dark">
+                    <i class="fas fa-th-large text-forge-blue mr-2"></i>
+                    {% if user.is_staff %}
+                        Panel Administrativo
+                    {% else %}
+                        Mis Aplicaciones
+                    {% endif %}
+                </h2>
+            </div>
+            
+            <!-- Grid de aplicaciones -->
+            <div class="flex-1 overflow-y-auto px-6 pb-6">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    
+                    <!-- Apps administrativas del sistema (siempre aparecen para staff) -->
+                    {% if user.is_staff %}
+                        <!-- Gestionar Aplicaciones -->
+                        <a href="{% url 'app:app_registry_list' %}" 
+                           class="bg-forge-light rounded-lg p-4 text-center hover:bg-forge-blue hover:bg-opacity-20 transition-all duration-200 cursor-pointer transform hover:scale-105 shadow-sm hover:shadow-md">
+                            <i class="fas fa-cogs text-forge-blue text-2xl mb-2"></i>
+                            <p class="text-forge-dark text-sm font-medium">Gestionar Apps</p>
+                            <span class="inline-block bg-forge-orange text-forge-white px-2 py-1 rounded-full text-xs mt-1">
+                                Admin
+                            </span>
+                        </a>
+                        
+                        <!-- Gestionar Usuarios -->
+                        <a href="{% url 'users:user_list' %}" 
+                           class="bg-forge-light rounded-lg p-4 text-center hover:bg-forge-blue hover:bg-opacity-20 transition-all duration-200 cursor-pointer transform hover:scale-105 shadow-sm hover:shadow-md">
+                            <i class="fas fa-users text-forge-blue text-2xl mb-2"></i>
+                            <p class="text-forge-dark text-sm font-medium">Gestionar Usuarios</p>
+                            <span class="inline-block bg-forge-orange text-forge-white px-2 py-1 rounded-full text-xs mt-1">
+                                Admin
+                            </span>
+                        </a>
+                    {% endif %}
+                    
+                    <!-- Apps registradas dinámicamente -->
+                    {% for app in available_apps %}
+                        <a href="{% url 'app:app_access' app.name %}" 
+                           class="bg-forge-light rounded-lg p-4 text-center hover:bg-{{ app.color }} hover:bg-opacity-20 transition-all duration-200 cursor-pointer transform hover:scale-105 shadow-sm hover:shadow-md">
+                            <i class="{{ app.icon }} text-{{ app.color }} text-2xl mb-2"></i>
+                            <p class="text-forge-dark text-sm font-medium">{{ app.display_name }}</p>
+                            {% if app.app_type == 'admin' %}
+                                <span class="inline-block bg-forge-orange text-forge-white px-2 py-1 rounded-full text-xs mt-1">
+                                    Admin
+                                </span>
+                            {% else %}
+                                <span class="inline-block bg-forge-blue text-forge-white px-2 py-1 rounded-full text-xs mt-1">
+                                    SAAS
+                                </span>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                    
+                    <!-- Mensaje cuando no hay apps adicionales -->
+                    {% if not available_apps and not user.is_staff %}
+                        <div class="col-span-full flex flex-col items-center justify-center h-64 text-center">
+                            <i class="fas fa-mobile-alt text-forge-gray text-6xl mb-4"></i>
+                            <h3 class="font-title text-lg font-semibold text-forge-dark mb-2">
+                                No hay aplicaciones disponibles
+                            </h3>
+                            <p class="text-forge-gray text-sm">
+                                Contacta al administrador para obtener acceso a las aplicaciones.
+                            </p>
+                        </div>
+                    {% endif %}
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

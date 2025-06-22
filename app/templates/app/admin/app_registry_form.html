@@ -1,0 +1,304 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - ForgeApp{% endblock %}
+
+{% block content %}
+<div class="h-full bg-forge-light overflow-y-auto">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="font-title text-3xl font-bold text-forge-dark mb-2">
+                    <i class="fas fa-cube text-forge-blue mr-2"></i>
+                    {{ title }}
+                </h1>
+                <p class="text-forge-gray">
+                    {% if app %}
+                        Modifica la configuración de la aplicación
+                    {% else %}
+                        Registra una nueva aplicación en el sistema
+                    {% endif %}
+                </p>
+            </div>
+            
+            <!-- Formulario -->
+            <div class="bg-forge-white rounded-xl shadow-md p-8">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Información básica -->
+                    <div class="bg-forge-light bg-opacity-50 rounded-lg p-6">
+                        <h3 class="font-title text-lg font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-info-circle text-forge-blue mr-2"></i>
+                            Información Básica
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Nombre técnico -->
+                            <div>
+                                <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                    <i class="fas fa-code mr-2 text-forge-blue"></i>
+                                    Nombre Técnico *
+                                </label>
+                                {{ form.name }}
+                                <p class="text-xs text-forge-gray mt-1">
+                                    Nombre interno de la app (ej: iatp, users)
+                                </p>
+                                {% if form.name.errors %}
+                                    <div class="mt-1 text-red-600 text-sm">
+                                        {% for error in form.name.errors %}
+                                            <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Nombre para mostrar -->
+                            <div>
+                                <label for="{{ form.display_name.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                    <i class="fas fa-tag mr-2 text-forge-blue"></i>
+                                    Nombre para Mostrar *
+                                </label>
+                                {{ form.display_name }}
+                                <p class="text-xs text-forge-gray mt-1">
+                                    Nombre que verán los usuarios
+                                </p>
+                                {% if form.display_name.errors %}
+                                    <div class="mt-1 text-red-600 text-sm">
+                                        {% for error in form.display_name.errors %}
+                                            <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Descripción -->
+                        <div class="mt-4">
+                            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                <i class="fas fa-align-left mr-2 text-forge-blue"></i>
+                                Descripción
+                            </label>
+                            {{ form.description }}
+                            <p class="text-xs text-forge-gray mt-1">
+                                Breve descripción de la funcionalidad
+                            </p>
+                            {% if form.description.errors %}
+                                <div class="mt-1 text-red-600 text-sm">
+                                    {% for error in form.description.errors %}
+                                        <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Configuración visual -->
+                    <div class="bg-forge-orange bg-opacity-10 rounded-lg p-6">
+                        <h3 class="font-title text-lg font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-palette text-forge-orange mr-2"></i>
+                            Configuración Visual
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Icono -->
+                            <div>
+                                <label for="{{ form.icon.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                    <i class="fas fa-icons mr-2 text-forge-orange"></i>
+                                    Icono
+                                </label>
+                                {{ form.icon }}
+                                <p class="text-xs text-forge-gray mt-1">
+                                    Clase de Font Awesome (ej: fas fa-coffee)
+                                </p>
+                                {% if form.icon.errors %}
+                                    <div class="mt-1 text-red-600 text-sm">
+                                        {% for error in form.icon.errors %}
+                                            <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Color -->
+                            <div>
+                                <label for="{{ form.color.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                    <i class="fas fa-palette mr-2 text-forge-orange"></i>
+                                    Color del Tema
+                                </label>
+                                {{ form.color }}
+                                <p class="text-xs text-forge-gray mt-1">
+                                    Clase de color (ej: forge-blue, forge-orange)
+                                </p>
+                                {% if form.color.errors %}
+                                    <div class="mt-1 text-red-600 text-sm">
+                                        {% for error in form.color.errors %}
+                                            <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuración técnica -->
+                    <div class="bg-forge-blue bg-opacity-10 rounded-lg p-6">
+                        <h3 class="font-title text-lg font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-cogs text-forge-blue mr-2"></i>
+                            Configuración Técnica
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Tipo de app -->
+                            <div>
+                                <label for="{{ form.app_type.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                    <i class="fas fa-sitemap mr-2 text-forge-blue"></i>
+                                    Tipo de Aplicación *
+                                </label>
+                                {{ form.app_type }}
+                                <p class="text-xs text-forge-gray mt-1">
+                                    Admin: Solo staff | SAAS: Usuarios con acceso
+                                </p>
+                                {% if form.app_type.errors %}
+                                    <div class="mt-1 text-red-600 text-sm">
+                                        {% for error in form.app_type.errors %}
+                                            <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- URL -->
+                            <div>
+                                <label for="{{ form.url_name.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                    <i class="fas fa-link mr-2 text-forge-blue"></i>
+                                    Nombre de URL *
+                                </label>
+                                {{ form.url_name }}
+                                <p class="text-xs text-forge-gray mt-1">
+                                    Nombre de la URL Django (ej: iatp:teapot)
+                                </p>
+                                {% if form.url_name.errors %}
+                                    <div class="mt-1 text-red-600 text-sm">
+                                        {% for error in form.url_name.errors %}
+                                            <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <!-- Orden -->
+                            <div>
+                                <label for="{{ form.order.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                    <i class="fas fa-sort-numeric-down mr-2 text-forge-blue"></i>
+                                    Orden de Aparición
+                                </label>
+                                {{ form.order }}
+                                <p class="text-xs text-forge-gray mt-1">
+                                    Número para ordenar en el dashboard
+                                </p>
+                                {% if form.order.errors %}
+                                    <div class="mt-1 text-red-600 text-sm">
+                                        {% for error in form.order.errors %}
+                                            <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Estado activo -->
+                            <div>
+                                <label class="block text-sm font-medium text-forge-dark mb-2">
+                                    <i class="fas fa-toggle-on mr-2 text-forge-blue"></i>
+                                    Estado
+                                </label>
+                                <div class="flex items-center mt-3">
+                                    {{ form.is_active }}
+                                    <label for="{{ form.is_active.id_for_label }}" class="ml-2 text-sm text-forge-dark">
+                                        Aplicación activa y disponible
+                                    </label>
+                                </div>
+                                {% if form.is_active.errors %}
+                                    <div class="mt-1 text-red-600 text-sm">
+                                        {% for error in form.is_active.errors %}
+                                            <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Errores generales del formulario -->
+                    {% if form.non_field_errors %}
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                            {% for error in form.non_field_errors %}
+                                <p class="text-red-600 text-sm">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>{{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Botones -->
+                    <div class="flex items-center justify-between pt-6 border-t border-forge-light">
+                        <a href="{% url 'app:app_registry_list' %}" 
+                           class="bg-forge-gray hover:bg-forge-dark text-forge-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Cancelar
+                        </a>
+                        
+                        <button type="submit" 
+                                class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white font-medium py-3 px-8 rounded-lg transition-colors duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-forge-blue focus:ring-opacity-50">
+                            <i class="fas fa-save mr-2"></i>
+                            {% if app %}Actualizar{% else %}Crear{% endif %} Aplicación
+                        </button>
+                    </div>
+                    
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos para los campos del formulario */
+    .form-control {
+        width: 100% !important;
+        padding: 12px 16px;
+        border: 1px solid rgba(100, 116, 139, 0.3);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        background-color: #ffffff;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    .form-control:hover {
+        border-color: rgba(59, 130, 246, 0.5);
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+    }
+    
+    select.form-control {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

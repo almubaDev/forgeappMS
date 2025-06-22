@@ -1,0 +1,322 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}{{ user_detail.get_full_name|default:user_detail.email }} - ForgeApp{% endblock %}
+
+{% block content %}
+<div class="h-full bg-forge-light overflow-y-auto">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="font-title text-3xl font-bold text-forge-dark">
+                        <i class="fas fa-user text-forge-blue mr-2"></i>
+                        Detalles del Usuario
+                    </h1>
+                    <p class="text-forge-gray mt-1">
+                        Información completa de {{ user_detail.get_full_name|default:user_detail.email }}
+                    </p>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <a href="{% url 'users:user_list' %}" 
+                       class="bg-forge-gray hover:bg-forge-dark text-forge-white px-2 py-1 rounded-lg transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver a Lista
+                    </a>
+                    <a href="{% url 'users:user_edit' user_detail.pk %}" 
+                       class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white px-2 py-1 rounded-lg transition-colors">
+                        <i class="fas fa-edit mr-2"></i>
+                        Editar Usuario
+                    </a>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Información principal -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Datos básicos -->
+                    <div class="bg-forge-white rounded-xl shadow-md p-6">
+                        <h3 class="font-title text-xl font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-id-card text-forge-blue mr-2"></i>
+                            Información Personal
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-forge-gray mb-1">Email</label>
+                                <p class="text-forge-dark font-medium">{{ user_detail.email }}</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-forge-gray mb-1">Nombre Completo</label>
+                                <p class="text-forge-dark font-medium">
+                                    {{ user_detail.get_full_name|default:"No especificado" }}
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-forge-gray mb-1">Nombre</label>
+                                <p class="text-forge-dark">{{ user_detail.first_name|default:"No especificado" }}</p>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-forge-gray mb-1">Apellido</label>
+                                <p class="text-forge-dark">{{ user_detail.last_name|default:"No especificado" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estado y permisos -->
+                    <div class="bg-forge-white rounded-xl shadow-md p-6">
+                        <h3 class="font-title text-xl font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-shield-alt text-forge-orange mr-2"></i>
+                            Estado y Permisos
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="text-center p-4 bg-forge-light rounded-lg">
+                                <div class="text-2xl mb-2">
+                                    {% if user_detail.is_active %}
+                                        <i class="fas fa-check-circle text-green-600"></i>
+                                    {% else %}
+                                        <i class="fas fa-times-circle text-red-600"></i>
+                                    {% endif %}
+                                </div>
+                                <p class="text-sm font-medium text-forge-dark">Estado</p>
+                                <p class="text-xs text-forge-gray">
+                                    {% if user_detail.is_active %}Activo{% else %}Inactivo{% endif %}
+                                </p>
+                            </div>
+                            
+                            <div class="text-center p-4 bg-forge-light rounded-lg">
+                                <div class="text-2xl mb-2">
+                                    {% if user_detail.is_staff %}
+                                        <i class="fas fa-user-tie text-forge-orange"></i>
+                                    {% else %}
+                                        <i class="fas fa-user text-forge-blue"></i>
+                                    {% endif %}
+                                </div>
+                                <p class="text-sm font-medium text-forge-dark">Tipo</p>
+                                <p class="text-xs text-forge-gray">
+                                    {% if user_detail.is_superuser %}
+                                        Superusuario
+                                    {% elif user_detail.is_staff %}
+                                        Staff
+                                    {% else %}
+                                        Usuario
+                                    {% endif %}
+                                </p>
+                            </div>
+                            
+                            <div class="text-center p-4 bg-forge-light rounded-lg">
+                                <div class="text-2xl mb-2">
+                                    <i class="fas fa-calendar text-forge-blue"></i>
+                                </div>
+                                <p class="text-sm font-medium text-forge-dark">Registro</p>
+                                <p class="text-xs text-forge-gray">
+                                    {{ user_detail.date_joined|date:"d/m/Y" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gestión de Accesos a Aplicaciones -->
+                    <div class="bg-forge-white rounded-xl shadow-md p-6">
+                        <h3 class="font-title text-xl font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-apps text-forge-orange mr-2"></i>
+                            Acceso a Aplicaciones Micro SAAS
+                        </h3>
+                        
+                        {% if apps_with_access %}
+                            <form method="post" class="space-y-4">
+                                {% csrf_token %}
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {% for item in apps_with_access %}
+                                        <div class="flex items-center p-4 border border-forge-light rounded-lg hover:bg-forge-light hover:bg-opacity-50 transition-colors">
+                                            <input type="checkbox" 
+                                                   name="app_access" 
+                                                   value="{{ item.app.id }}"
+                                                   id="app_{{ item.app.id }}"
+                                                   class="h-4 w-4 text-forge-orange focus:ring-forge-orange border-forge-gray rounded"
+                                                   {% if item.has_access %}checked{% endif %}>
+                                            <label for="app_{{ item.app.id }}" class="ml-3 flex items-center cursor-pointer flex-1">
+                                                <i class="{{ item.app.icon }} text-{{ item.app.color }} text-xl mr-3"></i>
+                                                <div>
+                                                    <p class="text-sm font-medium text-forge-dark">
+                                                        {{ item.app.display_name }}
+                                                    </p>
+                                                    <p class="text-xs text-forge-gray">
+                                                        {{ item.app.description|default:"Sin descripción" }}
+                                                    </p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="flex justify-end pt-4 border-t border-forge-light">
+                                    <button type="submit" 
+                                            class="bg-forge-orange hover:bg-forge-orange-dark text-forge-white font-medium px-2 py-1 rounded-lg transition-colors">
+                                        <i class="fas fa-save mr-2"></i>
+                                        Guardar Accesos
+                                    </button>
+                                </div>
+                                
+                            </form>
+                        {% else %}
+                            <div class="text-center py-8">
+                                <i class="fas fa-cube text-forge-gray text-4xl mb-4"></i>
+                                <p class="text-forge-gray">
+                                    No hay aplicaciones Micro SAAS disponibles para asignar.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                </div>
+                
+                <!-- Panel lateral -->
+                <div class="space-y-6">
+                    
+                    <!-- Avatar y acciones rápidas -->
+                    <div class="bg-forge-white rounded-xl shadow-md p-6 text-center">
+                        <div class="mb-4">
+                            <div class="w-20 h-20 mx-auto bg-forge-blue bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-forge-blue text-2xl"></i>
+                            </div>
+                        </div>
+                        
+                        <h4 class="font-semibold text-forge-dark mb-1">
+                            {{ user_detail.get_full_name|default:user_detail.email }}
+                        </h4>
+                        <p class="text-sm text-forge-gray mb-4">{{ user_detail.email }}</p>
+                        
+                        <!-- Badges -->
+                        <div class="space-y-2 mb-4">
+                            {% if user_detail.is_superuser %}
+                                <span class="inline-block bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-medium">
+                                    <i class="fas fa-crown mr-1"></i>
+                                    Superusuario
+                                </span>
+                            {% elif user_detail.is_staff %}
+                                <span class="inline-block bg-forge-orange text-forge-white px-3 py-1 rounded-full text-xs font-medium">
+                                    <i class="fas fa-user-tie mr-1"></i>
+                                    Staff
+                                </span>
+                            {% else %}
+                                <span class="inline-block bg-forge-blue text-forge-white px-3 py-1 rounded-full text-xs font-medium">
+                                    <i class="fas fa-user mr-1"></i>
+                                    Usuario
+                                </span>
+                            {% endif %}
+                            
+                            <br>
+                            
+                            {% if user_detail.is_active %}
+                                <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    Activo
+                                </span>
+                            {% else %}
+                                <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium">
+                                    <i class="fas fa-times-circle mr-1"></i>
+                                    Inactivo
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Acciones -->
+                    <div class="bg-forge-white rounded-xl shadow-md p-6">
+                        <h4 class="font-title text-lg font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-bolt text-forge-orange mr-2"></i>
+                            Acciones Rápidas
+                        </h4>
+                        
+                        <div class="space-y-3">
+                            <a href="{% url 'users:user_edit' user_detail.pk %}" 
+                               class="w-full bg-forge-blue hover:bg-forge-blue-dark text-forge-white text-center py-2 px-2 rounded-lg transition-colors block">
+                                <i class="fas fa-edit mr-2"></i>
+                                Editar Usuario
+                            </a>
+                            
+                            {% if user_detail != user %}
+                                <a href="{% url 'users:user_toggle_active' user_detail.pk %}" 
+                                   class="w-full bg-yellow-500 hover:bg-yellow-600 text-forge-white text-center py-2 px-2 rounded-lg transition-colors block">
+                                    <i class="fas fa-{% if user_detail.is_active %}pause{% else %}play{% endif %} mr-2"></i>
+                                    {% if user_detail.is_active %}Desactivar{% else %}Activar{% endif %}
+                                </a>
+                                
+                                {% if user.is_superuser %}
+                                    <a href="{% url 'users:user_toggle_staff' user_detail.pk %}" 
+                                       class="w-full bg-forge-orange hover:bg-forge-orange-dark text-forge-white text-center py-2 px-2 rounded-lg transition-colors block">
+                                        <i class="fas fa-user-tie mr-2"></i>
+                                        {% if user_detail.is_staff %}Quitar Staff{% else %}Dar Staff{% endif %}
+                                    </a>
+                                {% endif %}
+                                
+                                <a href="{% url 'users:user_delete' user_detail.pk %}" 
+                                   class="w-full bg-red-600 hover:bg-red-700 text-forge-white text-center py-2 px-2 rounded-lg transition-colors block">
+                                    <i class="fas fa-trash mr-2"></i>
+                                    Eliminar Usuario
+                                </a>
+                            {% else %}
+                                <div class="bg-forge-light rounded-lg p-3 text-center">
+                                    <p class="text-forge-gray text-sm">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        No puedes realizar acciones en tu propia cuenta
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Información técnica - MOVIDA AQUÍ -->
+                    <div class="bg-forge-white rounded-xl shadow-md p-6">
+                        <h3 class="font-title text-lg font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-cogs text-forge-blue mr-2"></i>
+                            Información Técnica
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center py-2 border-b border-forge-light">
+                                <span class="text-sm font-medium text-forge-gray">ID de Usuario</span>
+                                <span class="text-sm text-forge-dark font-mono">{{ user_detail.pk }}</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center py-2 border-b border-forge-light">
+                                <span class="text-sm font-medium text-forge-gray">Fecha de Registro</span>
+                                <span class="text-sm text-forge-dark">{{ user_detail.date_joined|date:"d/m/Y H:i:s" }}</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center py-2 border-b border-forge-light">
+                                <span class="text-sm font-medium text-forge-gray">Último Login</span>
+                                <span class="text-sm text-forge-dark">
+                                    {% if user_detail.last_login %}
+                                        {{ user_detail.last_login|date:"d/m/Y H:i:s" }}
+                                    {% else %}
+                                        Nunca
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center py-2">
+                                <span class="text-sm font-medium text-forge-gray">Username</span>
+                                <span class="text-sm text-forge-dark font-mono">{{ user_detail.email }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

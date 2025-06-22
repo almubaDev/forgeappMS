@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ForgeApp{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&family=Michroma:wght@400&family=Source+Code+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Configuración de fuentes */
+        body {
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Source Code Pro', monospace;
+        }
+        
+        .brand {
+            font-family: 'Michroma', sans-serif;
+        }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'forge-blue-light': '#7dd3fc',    // Azul claro del gato
+                        'forge-blue': '#3b82f6',          // Azul medio
+                        'forge-blue-dark': '#1e40af',     // Azul oscuro
+                        'forge-orange': '#ff6b35',        // Naranja vibrante de acento
+                        'forge-orange-dark': '#e55527',   // Naranja oscuro
+                        'forge-gray': '#64748b',          // Gris neutro
+                        'forge-dark': '#1e293b',          // Casi negro
+                        'forge-light': '#f8fafc',         // Blanco azulado
+                        'forge-white': '#ffffff',         // Blanco puro
+                    },
+                    fontFamily: {
+                        'mono': ['Roboto Mono', 'monospace'],
+                        'brand': ['Michroma', 'sans-serif'],
+                        'title': ['Source Code Pro', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="h-full bg-forge-light text-forge-dark flex flex-col">
+    
+    <!-- Navbar -->
+    {% include 'app/partials/navbar.html' %}
+    
+    <!-- Main Content - Ocupa todo el espacio restante -->
+    <main class="flex-1 overflow-hidden">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Messages flotantes - Posición fija sin afectar el flujo -->
+    {% if messages %}
+        <div class="fixed top-20 right-4 z-50 space-y-2">
+            {% for message in messages %}
+                <div class="message-alert p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 ease-in-out
+                    {% if message.tags == 'success' %}bg-green-500 text-white
+                    {% elif message.tags == 'error' %}bg-red-500 text-white
+                    {% elif message.tags == 'warning' %}bg-yellow-500 text-white
+                    {% else %}bg-forge-blue text-white{% endif %}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas 
+                                {% if message.tags == 'success' %}fa-check-circle
+                                {% elif message.tags == 'error' %}fa-exclamation-circle
+                                {% elif message.tags == 'warning' %}fa-exclamation-triangle
+                                {% else %}fa-info-circle{% endif %} mr-2">
+                            </i>
+                            <span class="text-sm font-medium">{{ message }}</span>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" 
+                                class="ml-4 text-white hover:text-gray-200 transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <!-- Extra JS -->
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Auto-hide messages after 5 seconds -->
+    <script>
+        // Auto-ocultar messages después de 5 segundos
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.message-alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateX(100%)';
+                setTimeout(function() {
+                    alert.remove();
+                }, 300);
+            });
+        }, 5000);
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,81 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Acceso Denegado - {{ app.display_name }}{% endblock %}
+
+{% block content %}
+<div class="bg-forge-light overflow-y-auto" style="height: calc(100vh - 64px);">
+    <div class="container mx-auto px-4 py-8 flex items-center justify-center min-h-full">
+        <div class="max-w-2xl w-full">
+            
+            <!-- Tarjeta principal -->
+            <div class="bg-forge-white rounded-xl shadow-2xl p-8 text-center">
+                
+                <!-- Icono de la app -->
+                <div class="mb-6">
+                    <div class="mx-auto w-20 h-20 bg-{{ app.color }} bg-opacity-20 rounded-full flex items-center justify-center">
+                        <i class="{{ app.icon }} text-{{ app.color }} text-3xl"></i>
+                    </div>
+                </div>
+                
+                <!-- Título -->
+                <h1 class="font-title text-3xl font-bold text-forge-dark mb-2">
+                    {{ app.display_name }}
+                </h1>
+                <p class="text-forge-gray text-lg mb-6">
+                    Acceso No Autorizado
+                </p>
+                
+                <!-- Descripción de la app -->
+                <div class="bg-forge-light rounded-lg p-6 mb-6 text-left">
+                    <h3 class="font-title text-lg font-semibold text-forge-dark mb-3">
+                        <i class="fas fa-info-circle text-forge-blue mr-2"></i>
+                        Acerca de esta aplicación
+                    </h3>
+                    
+                    {% block app_description %}
+                    <p class="text-forge-gray">
+                        {{ app.description|default:"Descripción no disponible." }}
+                    </p>
+                    {% endblock %}
+                    
+                    {% block app_features %}
+                    <!-- Las apps individuales pueden agregar características aquí -->
+                    {% endblock %}
+                </div>
+                
+                <!-- Mensaje de contacto -->
+                <div class="bg-forge-orange bg-opacity-10 border border-forge-orange rounded-lg p-6 mb-6">
+                    <h3 class="font-title text-lg font-semibold text-forge-dark mb-3">
+                        <i class="fas fa-envelope text-forge-orange mr-2"></i>
+                        ¿Interesado en esta aplicación?
+                    </h3>
+                    <p class="text-forge-gray mb-4">
+                        Para obtener acceso a <strong>{{ app.display_name }}</strong>, 
+                        ponte en contacto con nuestro equipo de ForgeApp.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        
+                        <div class="text-sm text-forge-gray">
+                            <i class="fas fa-at mr-1"></i>
+                            {{ contact_email }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botón volver -->
+                <div class="border-t border-forge-light pt-6">
+                    <a href="{% url 'app:dashboard' %}" 
+                       class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white font-medium px-6 py-2 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver al Dashboard
+                    </a>
+                </div>
+                
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

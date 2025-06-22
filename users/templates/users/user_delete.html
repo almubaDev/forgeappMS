@@ -1,0 +1,261 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Eliminar {{ user_detail.get_full_name|default:user_detail.email }} - ForgeApp{% endblock %}
+
+{% block content %}
+<div class="bg-forge-light overflow-y-auto" style="height: calc(100vh - 64px);">
+    <div class="container mx-auto px-4 py-8 flex items-center justify-center min-h-full">
+        <div class="max-w-2xl w-full">
+            
+            <!-- Tarjeta de confirmación -->
+            <div class="bg-forge-white rounded-xl shadow-2xl p-8">
+                
+                <!-- Header con icono de advertencia -->
+                <div class="text-center mb-8">
+                    <div class="mx-auto w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-exclamation-triangle text-red-600 text-3xl"></i>
+                    </div>
+                    <h2 class="font-title text-3xl font-bold text-forge-dark mb-2">
+                        ¿Eliminar Usuario?
+                    </h2>
+                </div>
+                
+                <!-- Información del usuario -->
+                <div class="bg-forge-light rounded-lg p-6 mb-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 bg-forge-blue bg-opacity-20 rounded-full flex items-center justify-center mr-6">
+                            <i class="fas fa-user text-forge-blue text-2xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-forge-dark text-xl mb-1">
+                                {{ user_detail.get_full_name|default:user_detail.email }}
+                            </h3>
+                            <p class="text-forge-gray text-sm mb-3">{{ user_detail.email }}</p>
+                            
+                            <!-- Badges en fila -->
+                            <div class="flex flex-wrap items-center gap-2">
+                                {% if user_detail.is_superuser %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                        <i class="fas fa-crown mr-1"></i>
+                                        Superuser
+                                    </span>
+                                {% elif user_detail.is_staff %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-forge-orange text-forge-white">
+                                        <i class="fas fa-user-tie mr-1"></i>
+                                        Staff
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-forge-blue text-forge-white">
+                                        <i class="fas fa-user mr-1"></i>
+                                        Usuario
+                                    </span>
+                                {% endif %}
+                                
+                                {% if user_detail.is_active %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i>
+                                        Activo
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <i class="fas fa-times-circle mr-1"></i>
+                                        Inactivo
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Información adicional en grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm border-t border-forge-gray border-opacity-30 pt-4">
+                        <div class="flex items-center text-forge-gray">
+                            <i class="fas fa-calendar mr-2 text-forge-blue"></i>
+                            <span>Registrado: {{ user_detail.date_joined|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="flex items-center text-forge-gray">
+                            <i class="fas fa-sign-in-alt mr-2 text-forge-blue"></i>
+                            <span>
+                                Último login: 
+                                {% if user_detail.last_login %}
+                                    {{ user_detail.last_login|date:"d/m/Y H:i" }}
+                                {% else %}
+                                    Nunca
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mensajes de advertencia en grid -->
+                <div class="grid grid-cols-1 gap-4 mb-6">
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <p class="text-red-700 text-sm font-medium">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            Esta acción es irreversible. El usuario será eliminado permanentemente.
+                        </p>
+                    </div>
+                    
+                    {% if user_detail.is_superuser %}
+                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                            <p class="text-purple-700 text-sm font-medium">
+                                <i class="fas fa-crown mr-2"></i>
+                                <strong>¡ATENCIÓN!</strong> Este es un superusuario con privilegios máximos.
+                            </p>
+                        </div>
+                    {% elif user_detail.is_staff %}
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                            <p class="text-orange-700 text-sm font-medium">
+                                <i class="fas fa-user-tie mr-2"></i>
+                                Este usuario tiene permisos de staff y acceso administrativo.
+                            </p>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <p class="text-yellow-700 text-sm font-medium mb-2">
+                            <i class="fas fa-database mr-2"></i>
+                            También se eliminarán todos los datos asociados:
+                        </p>
+                        <ul class="text-yellow-700 text-xs space-y-1 ml-6">
+                            <li>• Accesos a aplicaciones Micro SAAS</li>
+                            <li>• Registros de actividad y logs</li>
+                            <li>• Cualquier configuración personalizada</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Formulario de confirmación -->
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Checkboxes de confirmación -->
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <input type="checkbox" 
+                                   name="confirm_delete" 
+                                   id="confirm_delete"
+                                   class="mt-1 h-4 w-4 text-red-600 focus:ring-red-500 border-forge-gray rounded"
+                                   required>
+                            <label for="confirm_delete" class="ml-3 text-sm text-forge-dark">
+                                Entiendo que esta acción es irreversible y quiero eliminar 
+                                <strong>{{ user_detail.get_full_name|default:user_detail.email }}</strong> 
+                                definitivamente del sistema.
+                            </label>
+                        </div>
+                        
+                        <!-- Verificación adicional para superusers -->
+                        {% if user_detail.is_superuser %}
+                            <div class="flex items-start">
+                                <input type="checkbox" 
+                                       name="confirm_superuser_delete" 
+                                       id="confirm_superuser_delete"
+                                       class="mt-1 h-4 w-4 text-red-600 focus:ring-red-500 border-forge-gray rounded"
+                                       required>
+                                <label for="confirm_superuser_delete" class="ml-3 text-sm text-forge-dark">
+                                    <strong>Confirmo que entiendo que estoy eliminando un SUPERUSUARIO</strong> 
+                                    con privilegios administrativos máximos.
+                                </label>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Botones -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-forge-light">
+                        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                            <a href="{% url 'users:user_detail' user_detail.pk %}" 
+                               class="bg-forge-gray hover:bg-forge-dark text-forge-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 text-center">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Cancelar
+                            </a>
+                            
+                            <a href="{% url 'users:user_list' %}" 
+                               class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 text-center">
+                                <i class="fas fa-list mr-2"></i>
+                                Ir a Lista
+                            </a>
+                        </div>
+                        
+                        <button type="submit" 
+                                id="delete_button"
+                                class="bg-red-600 hover:bg-red-700 text-forge-white font-medium py-3 px-8 rounded-lg transition-colors duration-200 opacity-50 cursor-not-allowed w-full sm:w-auto">
+                            <i class="fas fa-trash mr-2"></i>
+                            Eliminar Usuario
+                        </button>
+                    </div>
+                    
+                </form>
+                
+            </div>
+            
+            <!-- Enlaces adicionales -->
+            <div class="text-center mt-6 space-y-3">
+                <a href="{% url 'users:user_edit' user_detail.pk %}" 
+                   class="block text-forge-blue hover:text-forge-blue-dark text-sm">
+                    <i class="fas fa-edit mr-1"></i>
+                    ¿Mejor editar la información del usuario?
+                </a>
+                
+                {% if user_detail.is_active %}
+                    <a href="{% url 'users:user_toggle_active' user_detail.pk %}" 
+                       class="block text-yellow-600 hover:text-yellow-700 text-sm">
+                        <i class="fas fa-pause mr-1"></i>
+                        ¿Solo desactivar temporalmente?
+                    </a>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Habilitar/deshabilitar botón de eliminar según checkboxes
+    document.addEventListener('DOMContentLoaded', function() {
+        const confirmDelete = document.getElementById('confirm_delete');
+        const confirmSuperuser = document.getElementById('confirm_superuser_delete');
+        const deleteButton = document.getElementById('delete_button');
+        
+        function updateDeleteButton() {
+            let canDelete = confirmDelete.checked;
+            
+            // Si es superuser, también debe estar marcado el segundo checkbox
+            if (confirmSuperuser) {
+                canDelete = canDelete && confirmSuperuser.checked;
+            }
+            
+            if (canDelete) {
+                deleteButton.disabled = false;
+                deleteButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                deleteButton.classList.add('hover:bg-red-700');
+            } else {
+                deleteButton.disabled = true;
+                deleteButton.classList.add('opacity-50', 'cursor-not-allowed');
+                deleteButton.classList.remove('hover:bg-red-700');
+            }
+        }
+        
+        confirmDelete.addEventListener('change', updateDeleteButton);
+        if (confirmSuperuser) {
+            confirmSuperuser.addEventListener('change', updateDeleteButton);
+        }
+        
+        // Confirmación adicional al enviar
+        deleteButton.addEventListener('click', function(e) {
+            const userName = '{{ user_detail.get_full_name|default:user_detail.email }}';
+            const isSuper = {{ user_detail.is_superuser|yesno:"true,false" }};
+            
+            let message = `¿Estás completamente seguro de eliminar a ${userName}?`;
+            if (isSuper) {
+                message += '\n\n¡ESTE ES UN SUPERUSUARIO! Esta acción es muy peligrosa.';
+            }
+            
+            if (!confirm(message)) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}

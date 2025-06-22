@@ -1,0 +1,225 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Crear Usuario - ForgeApp{% endblock %}
+
+{% block content %}
+<div class="h-full bg-forge-light overflow-y-auto">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <img src="{% static 'app/img/logo.png' %}" alt="ForgeApp Logo" class="mx-auto h-16 w-16 mb-4">
+                <h1 class="font-title text-3xl font-bold text-forge-dark mb-2">
+                    Crear Nuevo Usuario
+                </h1>
+                <p class="text-forge-gray">
+                    Completa el formulario para crear una nueva cuenta de usuario
+                </p>
+            </div>
+            
+            <!-- Formulario -->
+            <div class="bg-forge-white rounded-xl shadow-md p-8">
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Email -->
+                    <div>
+                        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                            <i class="fas fa-envelope mr-2 text-forge-blue"></i>
+                            Correo Electrónico *
+                        </label>
+                        <input type="email" 
+                               name="{{ form.email.name }}" 
+                               id="{{ form.email.id_for_label }}"
+                               class="form-control"
+                               placeholder="usuario@ejemplo.com"
+                               value="{{ form.email.value|default:'' }}"
+                               required>
+                        {% if form.email.errors %}
+                            <div class="mt-1 text-red-600 text-sm">
+                                {% for error in form.email.errors %}
+                                    <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Nombre y Apellido en una fila -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Nombre -->
+                        <div>
+                            <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                <i class="fas fa-user mr-2 text-forge-blue"></i>
+                                Nombre
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.first_name.name }}" 
+                                   id="{{ form.first_name.id_for_label }}"
+                                   class="form-control"
+                                   placeholder="Nombre"
+                                   value="{{ form.first_name.value|default:'' }}">
+                            {% if form.first_name.errors %}
+                                <div class="mt-1 text-red-600 text-sm">
+                                    {% for error in form.first_name.errors %}
+                                        <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Apellido -->
+                        <div>
+                            <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                <i class="fas fa-user mr-2 text-forge-blue"></i>
+                                Apellido
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.last_name.name }}" 
+                                   id="{{ form.last_name.id_for_label }}"
+                                   class="form-control"
+                                   placeholder="Apellido"
+                                   value="{{ form.last_name.value|default:'' }}">
+                            {% if form.last_name.errors %}
+                                <div class="mt-1 text-red-600 text-sm">
+                                    {% for error in form.last_name.errors %}
+                                        <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Contraseñas -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Contraseña -->
+                        <div>
+                            <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                <i class="fas fa-lock mr-2 text-forge-blue"></i>
+                                Contraseña *
+                            </label>
+                            <input type="password" 
+                                   name="{{ form.password1.name }}" 
+                                   id="{{ form.password1.id_for_label }}"
+                                   class="form-control"
+                                   placeholder="Contraseña"
+                                   required>
+                            {% if form.password1.errors %}
+                                <div class="mt-1 text-red-600 text-sm">
+                                    {% for error in form.password1.errors %}
+                                        <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Confirmar contraseña -->
+                        <div>
+                            <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-forge-dark mb-2">
+                                <i class="fas fa-lock mr-2 text-forge-blue"></i>
+                                Confirmar Contraseña *
+                            </label>
+                            <input type="password" 
+                                   name="{{ form.password2.name }}" 
+                                   id="{{ form.password2.id_for_label }}"
+                                   class="form-control"
+                                   placeholder="Confirmar contraseña"
+                                   required>
+                            {% if form.password2.errors %}
+                                <div class="mt-1 text-red-600 text-sm">
+                                    {% for error in form.password2.errors %}
+                                        <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Checkbox Staff (solo visible para superusers) -->
+                    {% if 'is_staff' in form.fields %}
+                        <div class="bg-forge-orange bg-opacity-10 border border-forge-orange rounded-lg p-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" 
+                                       name="{{ form.is_staff.name }}" 
+                                       id="{{ form.is_staff.id_for_label }}"
+                                       class="h-4 w-4 text-forge-orange focus:ring-forge-orange border-forge-gray rounded"
+                                       {{ form.is_staff.value|yesno:"checked," }}>
+                                <label for="{{ form.is_staff.id_for_label }}" class="ml-2 block text-sm font-medium text-forge-dark">
+                                    <i class="fas fa-crown mr-2 text-forge-orange"></i>
+                                    Otorgar permisos de Staff
+                                </label>
+                            </div>
+                            <p class="text-xs text-forge-gray mt-1 ml-6">
+                                Los usuarios staff pueden acceder a funciones administrativas
+                            </p>
+                            {% if form.is_staff.errors %}
+                                <div class="mt-1 text-red-600 text-sm ml-6">
+                                    {% for error in form.is_staff.errors %}
+                                        <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Errores generales del formulario -->
+                    {% if form.non_field_errors %}
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                            {% for error in form.non_field_errors %}
+                                <p class="text-red-600 text-sm">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>{{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Botones -->
+                    <div class="flex items-center justify-between pt-6">
+                        <a href="{% url 'app:dashboard' %}" 
+                           class="bg-forge-gray hover:bg-forge-dark text-forge-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Cancelar
+                        </a>
+                        
+                        <button type="submit" 
+                                class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white font-medium py-3 px-8 rounded-lg transition-colors duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-forge-blue focus:ring-opacity-50">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Crear Usuario
+                        </button>
+                    </div>
+                    
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos para el formulario de registro */
+    .form-control {
+        width: 100% !important;
+        padding: 12px 16px;
+        border: 1px solid rgba(100, 116, 139, 0.3);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        background-color: #ffffff;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    .form-control:hover {
+        border-color: rgba(59, 130, 246, 0.5);
+    }
+</style>
+{% endblock %}

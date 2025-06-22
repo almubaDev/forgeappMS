@@ -1,0 +1,220 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Usuarios - ForgeApp{% endblock %}
+
+{% block content %}
+<div class="h-full bg-forge-light flex flex-col">
+    
+    <!-- Header -->
+    <div class="bg-forge-white border-b border-forge-blue-light flex-shrink-0">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="font-title text-3xl font-bold text-forge-dark">
+                        <i class="fas fa-users text-forge-blue mr-2"></i>
+                        Gestión de Usuarios
+                    </h1>
+                    <p class="text-forge-gray mt-1">
+                        Administra todos los usuarios del sistema
+                    </p>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <a href="{% url 'app:dashboard' %}" 
+                       class="bg-forge-gray hover:bg-forge-dark text-forge-white px-2 py-1 rounded-lg transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver al Dashboard
+                    </a>
+                    <a href="{% url 'users:signup' %}" 
+                       class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white px-2 py-1 rounded-lg transition-colors">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Nuevo Usuario
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtros y búsqueda -->
+    <div class="bg-forge-white border-b border-forge-blue-light flex-shrink-0">
+        <div class="container mx-auto px-4 py-4">
+            <form method="get" class="flex flex-wrap items-center gap-4">
+                <!-- Búsqueda -->
+                <div class="flex-1 min-w-64">
+                    <input type="text" 
+                           name="search" 
+                           value="{{ search|default:'' }}"
+                           placeholder="Buscar por email, nombre o apellido..."
+                           class="w-full px-4 py-2 border border-forge-gray border-opacity-30 rounded-lg focus:ring-2 focus:ring-forge-blue focus:border-forge-blue">
+                </div>
+                
+                <!-- Filtro estado -->
+                <select name="is_active" class="px-4 py-2 border border-forge-gray border-opacity-30 rounded-lg focus:ring-2 focus:ring-forge-blue">
+                    <option value="">Todos los estados</option>
+                    <option value="true" {% if is_active_filter == 'true' %}selected{% endif %}>Activos</option>
+                    <option value="false" {% if is_active_filter == 'false' %}selected{% endif %}>Inactivos</option>
+                </select>
+                
+                <!-- Filtro staff -->
+                <select name="is_staff" class="px-4 py-2 border border-forge-gray border-opacity-30 rounded-lg focus:ring-2 focus:ring-forge-blue">
+                    <option value="">Todos los tipos</option>
+                    <option value="true" {% if is_staff_filter == 'true' %}selected{% endif %}>Staff</option>
+                    <option value="false" {% if is_staff_filter == 'false' %}selected{% endif %}>Usuarios</option>
+                </select>
+                
+                <!-- Botones -->
+                <button type="submit" class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white px-2 py-1 rounded-lg transition-colors">
+                    <i class="fas fa-search mr-2"></i>
+                    Buscar
+                </button>
+                
+                <a href="{% url 'users:user_list' %}" class="bg-forge-gray hover:bg-forge-dark text-forge-white px-2 py-1 rounded-lg transition-colors">
+                    <i class="fas fa-times mr-2"></i>
+                    Limpiar
+                </a>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Contenido -->
+    <div class="flex-1 overflow-hidden p-4">
+        <div class="bg-forge-white rounded-xl shadow-md h-full flex flex-col">
+            
+            <!-- Estadísticas rápidas -->
+            <div class="p-6 border-b border-forge-light">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-forge-blue">{{ users.count }}</p>
+                        <p class="text-forge-gray text-sm">Total Usuarios</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-green-600">{{ users|length }}</p>
+                        <p class="text-forge-gray text-sm">Mostrados</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-forge-orange">{{ users|length }}</p>
+                        <p class="text-forge-gray text-sm">Staff</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-forge-blue">{{ users|length }}</p>
+                        <p class="text-forge-gray text-sm">Activos</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabla de usuarios -->
+            <div class="flex-1 overflow-y-auto">
+                {% if users %}
+                    <table class="w-full">
+                        <thead class="bg-forge-light sticky top-0">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-forge-gray uppercase tracking-wider">
+                                    Usuario
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-forge-gray uppercase tracking-wider">
+                                    Estado
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-forge-gray uppercase tracking-wider">
+                                    Tipo
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-forge-gray uppercase tracking-wider">
+                                    Registro
+                                </th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-forge-gray uppercase tracking-wider">
+                                    Acción
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-forge-light">
+                            {% for user_item in users %}
+                                <tr class="hover:bg-forge-light hover:bg-opacity-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <div class="h-10 w-10 rounded-full bg-forge-blue bg-opacity-20 flex items-center justify-center">
+                                                    <i class="fas fa-user text-forge-blue"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-forge-dark">
+                                                    {{ user_item.get_full_name|default:user_item.email }}
+                                                </div>
+                                                <div class="text-sm text-forge-gray">
+                                                    {{ user_item.email }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {% if user_item.is_active %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-check-circle mr-1"></i>
+                                                Activo
+                                            </span>
+                                        {% else %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                <i class="fas fa-times-circle mr-1"></i>
+                                                Inactivo
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {% if user_item.is_superuser %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                <i class="fas fa-crown mr-1"></i>
+                                                Superuser
+                                            </span>
+                                        {% elif user_item.is_staff %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-forge-orange text-forge-white">
+                                                <i class="fas fa-user-tie mr-1"></i>
+                                                Staff
+                                            </span>
+                                        {% else %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-forge-blue text-forge-white">
+                                                <i class="fas fa-user mr-1"></i>
+                                                Usuario
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-forge-gray">
+                                        {{ user_item.date_joined|date:"d/m/Y H:i" }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <a href="{% url 'users:user_detail' user_item.pk %}" 
+                                           class="inline-flex items-center px-3 py-1 bg-forge-blue hover:bg-forge-blue-dark text-forge-white rounded-lg transition-colors text-sm"
+                                           title="Ver detalles">
+                                            <i class="fas fa-eye mr-2"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="flex flex-col items-center justify-center h-64 text-center">
+                        <i class="fas fa-users text-forge-gray text-6xl mb-4"></i>
+                        <h3 class="font-title text-lg font-semibold text-forge-dark mb-2">
+                            No se encontraron usuarios
+                        </h3>
+                        <p class="text-forge-gray text-sm mb-4">
+                            {% if search %}
+                                No hay usuarios que coincidan con "{{ search }}"
+                            {% else %}
+                                No hay usuarios registrados en el sistema
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'users:signup' %}" 
+                           class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Crear Primer Usuario
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
