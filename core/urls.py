@@ -7,6 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
     path('iatp/', include('iatp.urls')),
+    path('fapass/', include('fapass.urls')),
     path('', include('app.urls')),
 ]
 

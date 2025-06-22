@@ -10,7 +10,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-j2#a_2p$y%bs0zy4lr7cp#!rxr8_7-y-7^04mem96_vmcr=irc'
+# Configuración de Fapass
+FAPASS_MASTER_KEY = os.environ.get('FAPASS_MASTER_KEY', 'default-master-key-change-in-production-immediately')
 
+# Instalar cryptography si no está instalado
+# pip install cryptography
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

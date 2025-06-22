@@ -1,0 +1,233 @@
+<!-- Template: fapass/templates/fapass/dashboard.html -->
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Fapass - Gestor de Credenciales{% endblock %}
+
+{% block content %}
+<div class="h-full bg-forge-light flex flex-col">
+    
+    <!-- Header -->
+    <div class="bg-forge-white border-b border-forge-blue-light flex-shrink-0">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="font-title text-3xl font-bold text-forge-dark">
+                        <i class="fas fa-shield-alt text-forge-blue mr-2"></i>
+                        Fapass - Gestor de Credenciales
+                    </h1>
+                    <p class="text-forge-gray mt-1">
+                        Sistema seguro de gestión de credenciales con acceso temporal
+                    </p>
+                </div>
+                
+                <!-- Estadísticas rápidas -->
+                <div class="flex items-center space-x-6">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-forge-blue">{{ stats.active_sites }}</p>
+                        <p class="text-forge-gray text-sm">Sitios Activos</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-green-600">{{ stats.total_sites }}</p>
+                        <p class="text-forge-gray text-sm">Total Sitios</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-forge-orange">{{ stats.active_tokens }}</p>
+                        <p class="text-forge-gray text-sm">Tokens Activos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div class="flex-1 overflow-hidden p-4">
+        <div class="max-w-7xl mx-auto h-full">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                
+                <!-- Panel principal izquierdo -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Tarjetas de acciones rápidas -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        
+                        <!-- Gestionar Sitios -->
+                        <a href="{% url 'fapass:site_list' %}" 
+                           class="bg-forge-white rounded-xl p-6 text-center hover:bg-forge-blue hover:bg-opacity-10 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
+                            <i class="fas fa-globe text-forge-blue text-3xl mb-3"></i>
+                            <h3 class="font-semibold text-forge-dark mb-1">Mis Sitios</h3>
+                            <p class="text-sm text-forge-gray">{{ stats.total_sites }} registrados</p>
+                        </a>
+                        
+                        <!-- Gestionar Tokens -->
+                        <a href="{% url 'fapass:token_list' %}" 
+                           class="bg-forge-white rounded-xl p-6 text-center hover:bg-forge-orange hover:bg-opacity-10 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
+                            <i class="fas fa-ticket-alt text-forge-orange text-3xl mb-3"></i>
+                            <h3 class="font-semibold text-forge-dark mb-1">Tokens</h3>
+                            <p class="text-sm text-forge-gray">{{ stats.total_tokens }} creados</p>
+                        </a>
+                        
+                        <!-- Generador de Contraseñas -->
+                        <a href="{% url 'fapass:password_generator' %}" 
+                           class="bg-forge-white rounded-xl p-6 text-center hover:bg-purple-50 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
+                            <i class="fas fa-random text-purple-600 text-3xl mb-3"></i>
+                            <h3 class="font-semibold text-forge-dark mb-1">Generador</h3>
+                            <p class="text-sm text-forge-gray">Contraseñas seguras</p>
+                        </a>
+                        
+                    </div>
+                    
+                    <!-- Alertas importantes -->
+                    {% if stats.expiring_soon > 0 %}
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold text-yellow-800">Tokens por expirar</h4>
+                                    <p class="text-sm text-yellow-700">
+                                        Tienes {{ stats.expiring_soon }} token{{ stats.expiring_soon|pluralize:"es" }} que expira{{ stats.expiring_soon|pluralize:"n" }} en las próximas 24 horas.
+                                        <a href="{% url 'fapass:token_list' %}?status=active" class="underline font-medium">Ver tokens</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Sitios más usados -->
+                    <div class="bg-forge-white rounded-xl shadow-md p-6">
+                        <h3 class="font-title text-lg font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-chart-bar text-forge-blue mr-2"></i>
+                            Sitios Más Utilizados
+                        </h3>
+                        
+                        {% if popular_sites %}
+                            <div class="space-y-3">
+                                {% for site in popular_sites %}
+                                    <div class="flex items-center justify-between p-3 bg-forge-light rounded-lg">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-globe text-forge-blue mr-3"></i>
+                                            <div>
+                                                <p class="font-medium text-forge-dark">{{ site.name }}</p>
+                                                <p class="text-sm text-forge-gray">{{ site.get_domain }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-lg font-bold text-forge-blue">{{ site.usage_count }}</p>
+                                            <p class="text-xs text-forge-gray">usos</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-8">
+                                <i class="fas fa-chart-bar text-forge-gray text-4xl mb-3"></i>
+                                <p class="text-forge-gray">No hay estadísticas de uso aún</p>
+                                <p class="text-sm text-forge-gray">Los datos aparecerán cuando uses tokens</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                </div>
+                
+                <!-- Panel derecho -->
+                <div class="space-y-6">
+                    
+                    <!-- Estadísticas detalladas -->
+                    <div class="bg-forge-white rounded-xl shadow-md p-6">
+                        <h3 class="font-title text-lg font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-chart-pie text-forge-orange mr-2"></i>
+                            Resumen General
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-forge-gray">Sitios registrados</span>
+                                <span class="font-semibold text-forge-dark">{{ stats.total_sites }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-forge-gray">Sitios activos</span>
+                                <span class="font-semibold text-green-600">{{ stats.active_sites }}</span>
+                            </div>
+                            <div class="border-t border-forge-light my-2"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-forge-gray">Tokens totales</span>
+                                <span class="font-semibold text-forge-dark">{{ stats.total_tokens }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-forge-gray">Tokens activos</span>
+                                <span class="font-semibold text-forge-orange">{{ stats.active_tokens }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actividad reciente -->
+                    <div class="bg-forge-white rounded-xl shadow-md p-6">
+                        <h3 class="font-title text-lg font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-history text-forge-blue mr-2"></i>
+                            Actividad Reciente
+                        </h3>
+                        
+                        {% if recent_logs %}
+                            <div class="space-y-3">
+                                {% for log in recent_logs %}
+                                    <div class="flex items-center p-3 bg-forge-light rounded-lg">
+                                        <div class="flex-shrink-0 mr-3">
+                                            {% if log.success %}
+                                                <i class="fas fa-check-circle text-green-600"></i>
+                                            {% else %}
+                                                <i class="fas fa-times-circle text-red-600"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-medium text-forge-dark">
+                                                {% if log.site %}
+                                                    {{ log.site.name }}
+                                                {% else %}
+                                                    Sitio desconocido
+                                                {% endif %}
+                                            </p>
+                                            <p class="text-xs text-forge-gray">
+                                                {{ log.get_action_display }} - {{ log.timestamp|timesince }} ago
+                                            </p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-6">
+                                <i class="fas fa-history text-forge-gray text-3xl mb-2"></i>
+                                <p class="text-forge-gray text-sm">No hay actividad reciente</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Acciones rápidas adicionales -->
+                    <div class="bg-forge-white rounded-xl shadow-md p-6">
+                        <h3 class="font-title text-lg font-semibold text-forge-dark mb-4">
+                            <i class="fas fa-bolt text-forge-orange mr-2"></i>
+                            Acciones Rápidas
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            <a href="{% url 'fapass:site_create' %}" 
+                               class="block w-full bg-forge-blue hover:bg-forge-blue-dark text-forge-white text-center py-2 px-4 rounded-lg transition-colors">
+                                <i class="fas fa-plus mr-2"></i>
+                                Agregar Sitio
+                            </a>
+                            
+                            <a href="{% url 'fapass:token_create' %}" 
+                               class="block w-full bg-forge-orange hover:bg-forge-orange-dark text-forge-white text-center py-2 px-4 rounded-lg transition-colors">
+                                <i class="fas fa-ticket-alt mr-2"></i>
+                                Crear Token
+                            </a>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

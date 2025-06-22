@@ -1,0 +1,280 @@
+<!-- Template: fapass/templates/fapass/sites/list.html -->
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Mis Sitios - Fapass{% endblock %}
+
+{% block content %}
+<div class="h-full bg-forge-light flex flex-col">
+    
+    <!-- Header -->
+    <div class="bg-forge-white border-b border-forge-blue-light flex-shrink-0">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="font-title text-3xl font-bold text-forge-dark">
+                        <i class="fas fa-globe text-forge-blue mr-2"></i>
+                        Mis Sitios
+                    </h1>
+                    <p class="text-forge-gray mt-1">
+                        Gestiona tus credenciales de forma segura
+                    </p>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <a href="{% url 'fapass:dashboard' %}" 
+                       class="bg-forge-gray hover:bg-forge-dark text-forge-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver
+                    </a>
+                    <a href="{% url 'fapass:site_create' %}" 
+                       class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i>
+                        Nuevo Sitio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="bg-forge-white border-b border-forge-blue-light flex-shrink-0">
+        <div class="container mx-auto px-4 py-4">
+            <form method="get" class="flex flex-wrap items-center gap-4">
+                <!-- Búsqueda -->
+                <div class="flex-1 min-w-64">
+                    {{ filter_form.search }}
+                </div>
+                
+                <!-- Estado -->
+                {{ filter_form.is_active }}
+                
+                <!-- Botones -->
+                <button type="submit" class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-search mr-2"></i>
+                    Buscar
+                </button>
+                
+                <a href="{% url 'fapass:site_list' %}" class="bg-forge-gray hover:bg-forge-dark text-forge-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fas fa-times mr-2"></i>
+                    Limpiar
+                </a>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Contenido -->
+    <div class="flex-1 overflow-hidden p-4">
+        <div class="bg-forge-white rounded-xl shadow-md h-full flex flex-col">
+            
+            <!-- Lista de sitios -->
+            <div class="flex-1 overflow-y-auto">
+                {% if page_obj %}
+                    <div class="divide-y divide-forge-light">
+                        {% for site in page_obj %}
+                            <div class="p-6 hover:bg-forge-light hover:bg-opacity-50 transition-colors">
+                                <div class="flex items-center justify-between">
+                                    
+                                    <!-- Información principal -->
+                                    <div class="flex-1">
+                                        <div class="flex items-center mb-3">
+                                            <div class="w-12 h-12 bg-forge-blue bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                                                <i class="fas fa-globe text-forge-blue text-lg"></i>
+                                            </div>
+                                            <div>
+                                                <h3 class="font-semibold text-forge-dark text-lg">
+                                                    {{ site.name }}
+                                                </h3>
+                                                <p class="text-sm text-forge-gray break-all">
+                                                    {{ site.url }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Credenciales -->
+                                        <div class="ml-16 space-y-2">
+                                            <div class="flex items-center space-x-4">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-user text-forge-blue mr-2"></i>
+                                                    <span class="text-sm font-medium text-forge-dark">{{ site.username }}</span>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-lock text-green-600 mr-2"></i>
+                                                    <span class="text-sm text-forge-dark password-field" data-site-id="{{ site.pk }}">
+                                                        ••••••••••••
+                                                    </span>
+                                                    <button type="button" 
+                                                            class="ml-2 text-forge-blue hover:text-forge-blue-dark toggle-password"
+                                                            data-site-id="{{ site.pk }}"
+                                                            title="Ver contraseña">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            {% if site.description %}
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-comment text-forge-orange mr-2"></i>
+                                                    <span class="text-sm text-forge-gray">{{ site.description }}</span>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <div class="flex items-center space-x-4 text-xs text-forge-gray">
+                                                <span>
+                                                    <i class="fas fa-calendar mr-1"></i>
+                                                    Creado: {{ site.created_at|date:"d/m/Y" }}
+                                                </span>
+                                                {% if site.last_used %}
+                                                    <span>
+                                                        <i class="fas fa-clock mr-1"></i>
+                                                        Usado: {{ site.last_used|timesince }} ago
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Estado y acciones -->
+                                    <div class="flex items-center space-x-4">
+                                        <!-- Estado -->
+                                        <div>
+                                            {% if site.is_active %}
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    <i class="fas fa-check-circle mr-1"></i>
+                                                    Activo
+                                                </span>
+                                            {% else %}
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    <i class="fas fa-times-circle mr-1"></i>
+                                                    Inactivo
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Acciones -->
+                                        <div class="flex space-x-2">
+                                            <a href="{{ site.url }}" 
+                                               target="_blank"
+                                               class="text-forge-blue hover:text-forge-blue-dark p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                                               title="Visitar sitio">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </a>
+                                            <a href="{% url 'fapass:site_edit' site.pk %}" 
+                                               class="text-forge-orange hover:text-forge-orange-dark p-2 rounded-lg hover:bg-orange-50 transition-colors"
+                                               title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'fapass:site_delete' site.pk %}" 
+                                               class="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                                               title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Paginación -->
+                    {% if page_obj.has_other_pages %}
+                        <div class="border-t border-forge-light p-6">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-forge-gray">
+                                    Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} sitios
+                                </div>
+                                
+                                <div class="flex space-x-2">
+                                    {% if page_obj.has_previous %}
+                                        <a href="?page=1" class="px-3 py-1 bg-forge-gray text-forge-white rounded">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                        <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-forge-gray text-forge-white rounded">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    {% endif %}
+                                    
+                                    <span class="px-3 py-1 bg-forge-blue text-forge-white rounded">
+                                        {{ page_obj.number }}
+                                    </span>
+                                    
+                                    {% if page_obj.has_next %}
+                                        <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-forge-gray text-forge-white rounded">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                        <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 bg-forge-gray text-forge-white rounded">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                {% else %}
+                    <div class="flex flex-col items-center justify-center h-64 text-center">
+                        <i class="fas fa-globe text-forge-gray text-6xl mb-4"></i>
+                        <h3 class="font-title text-lg font-semibold text-forge-dark mb-2">
+                            No hay sitios registrados
+                        </h3>
+                        <p class="text-forge-gray text-sm mb-4">
+                            Comienza agregando tu primer sitio web
+                        </p>
+                        <a href="{% url 'fapass:site_create' %}" 
+                           class="bg-forge-blue hover:bg-forge-blue-dark text-forge-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
+                            Agregar Primer Sitio
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Funcionalidad para mostrar/ocultar contraseñas
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+            const siteId = this.getAttribute('data-site-id');
+            const passwordField = document.querySelector(`.password-field[data-site-id="${siteId}"]`);
+            const icon = this.querySelector('i');
+            
+            if (passwordField.textContent.includes('••••')) {
+                // Mostrar contraseña
+                fetch(`{% url 'fapass:get_site_password' 0 %}`.replace('0', siteId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        passwordField.textContent = data.password;
+                        icon.className = 'fas fa-eye-slash';
+                        this.title = 'Ocultar contraseña';
+                    } else {
+                        alert('Error al obtener contraseña: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al obtener contraseña');
+                });
+            } else {
+                // Ocultar contraseña
+                passwordField.textContent = '••••••••••••';
+                icon.className = 'fas fa-eye';
+                this.title = 'Ver contraseña';
+            }
+        });
+    });
+</script>
+{% endblock %}
